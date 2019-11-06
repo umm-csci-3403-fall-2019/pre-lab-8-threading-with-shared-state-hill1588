@@ -49,26 +49,41 @@ public class ThreadedSearch<T> implements Searcher<T>, Runnable {
          * threads, wait for them to all terminate, and then return the answer
          * in the shared `Answer` instance.
          */
+
+        // A shareable instance of answer that can be shared among all the threads
         Answer shared = new Answer();
 
+        // An array that holds all of the threads
         Thread[] threads = new Thread[numThreads];
 
+        // The max size that a thread will hold. Even distribution.
         int upperBound = list.size()/numThreads;
 
+        // Sets that limits for all of the threads using ThreadedSearch, then creating and running the Threads
         for (int i = 0; i < numThreads; i++) {
-            begin = upperBound * i;
-            end = upperBound * (i + 1);
+            begin = upperBound * i;     // Lower bound must be one i below end
+            end = upperBound * (i + 1); // Always one higher than the lowest bound
             ThreadedSearch<T> threadedSearch = new ThreadedSearch<>(target, list, begin, end, shared);
-            threads[i] = new Thread(threadedSearch);
+            threads[i] = new Thread(threadedSearch);    // Utilizes ThreadedSearch to find a value in a list
             threads[i].start();
         }
 
+        // Makes sure that one thread happens at a time.
+        for (int i = 0; i < numThreads; i++) {
+            threads[i].join();  // Previous is terminated before the next begins.
+        }
 
         return shared.getAnswer();
     }
 
     public void run() {
-
+        // Compares all of the values in the range to see if the target value is in the range
+        for (int i = begin; i < end; i++) {
+            if(list.get(i).equals(target)) {
+                answer.setAnswer(true); // Answer is set to true if found
+                return;                 // Ends the loop to ensure efficiency
+            }
+        }
     }
 
     private class Answer {
