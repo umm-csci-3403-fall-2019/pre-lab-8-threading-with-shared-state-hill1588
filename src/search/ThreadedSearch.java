@@ -77,12 +77,15 @@ public class ThreadedSearch<T> implements Searcher<T>, Runnable {
     }
 
     public void run() {
-        // Compares all of the values in the range to see if the target value is in the range
-        for (int i = begin; i < end; i++) {
-            if(list.get(i).equals(target)) {
-                answer.setAnswer(true); // Answer is set to true if found
-                return;                 // Ends the loop to ensure efficiency
-            }
+            // Compares all of the values in the range to see if the target value is in the range
+            for (int i = begin; i < end; i++) {
+                if (answer.getAnswer()) {
+                    return;
+                }
+                if (list.get(i).equals(target)) {
+                    answer.setAnswer(true); // Answer is set to true if found
+                    return;                 // Ends the loop to ensure efficiency
+                }
         }
     }
 
