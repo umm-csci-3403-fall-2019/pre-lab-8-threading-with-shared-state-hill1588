@@ -55,6 +55,14 @@ public class ThreadedSearch<T> implements Searcher<T>, Runnable {
 
         int upperBound = list.size()/numThreads;
 
+        for (int i = 0; i < numThreads; i++) {
+            begin = upperBound * i;
+            end = upperBound * (i + 1);
+            ThreadedSearch<T> threadedSearch = new ThreadedSearch<>(target, list, begin, end, shared);
+            threads[i] = new Thread(threadedSearch);
+            threads[i].start();
+        }
+
 
         return shared.getAnswer();
     }
